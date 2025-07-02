@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>بخش رضایت مشتریان</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+    font-family: 'Tahoma', sans-serif;
+    direction: rtl;
+    text-align: center;
+  }
+  .container {
+    padding: 40px;
+  }
+  h1 {
+    color: #4b79a1;
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+  .comment-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    display: inline-block;
+    max-width: 500px;
+    margin-bottom: 20px;
+    text-align: right;
+  }
+  .comment-box p {
+    margin: 5px 0;
+    font-size: 16px;
+  }
+  .image-frame {
+    background: white;
+    width: 320px;
+    margin: 30px auto;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    padding: 10px;
+  }
+  .image-frame img {
+    width: 100%;
+    border-radius: 12px;
+  }
+  .caption {
+    margin-top: 12px;
+    font-size: 18px;
+    color: #4b79a1;
+    font-weight: bold;
+  }
+  .back-link, .add-comment-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #4b79a1;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  .back-link:hover, .add-comment-btn:hover {
+    background: #3a5e7a;
+  }
+  .form-container {
+    margin: 20px auto;
+    max-width: 400px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    text-align: right;
+    display: none;
+  }
+  .form-container input, .form-container textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  .form-container button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    background: #4b79a1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .form-container button:hover {
+    background: #3a5e7a;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>بخش رضایت مشتریان از جنده</h1>
+  
+  <div id="comments-section"></div>
+
+  <div class="image-frame">
+    <a href="https://ibb.co/ZpZ9BCvT" target="_blank" rel="noopener noreferrer">
+      <img src="https://i.ibb.co/9kMPbjBY/photo-2025-06-30-02-04-65.jpg" alt="تصویر رضایت مشتریان" />
+    </a>
+    <div class="caption">تصاویر رضایت مشتریان</div>
+  </div>
+  
+  <div class="add-comment-btn" onclick="showForm()">ثبت نظر مشتری</div>
+  
+  <div class="form-container" id="formContainer">
+    <input type="text" id="nameInput" placeholder="نام شما">
+    <textarea id="commentInput" rows="4" placeholder="نظر شما"></textarea>
+    <button onclick="addComment()">ثبت نظر</button>
+  </div>
+  
+ <a href="/" class="back-link">بازگشت به صفحه اول</a>
+</div>
+
+<script>
+function showForm() {
+  document.getElementById('formContainer').style.display = 'block';
+}
+
+function loadComments() {
+  fetch('/get-comments')
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('comments-section');
+      container.innerHTML = '';
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'comment-box';
+        div.innerHTML = `<p><strong>${item.name}:</strong> ${item.comment}</p>`;
+        container.appendChild(div);
+      });
+    });
+}
+
+function addComment() {
+  const name = document.getElementById('nameInput').value.trim();
+  const comment = document.getElementById('commentInput').value.trim();
+  
+  if (name && comment) {
+    fetch('/add-comment', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name, comment})
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        loadComments();
+        document.getElementById('nameInput').value = '';
+        document.getElementById('commentInput').value = '';
+        document.getElementById('formContainer').style.display = 'none';
+      } else {
+        alert('خطا در ثبت نظر');
+      }
+    });
+  } else {
+    alert('لطفاً نام و نظر خود را وارد کنید.');
+  }
+}
+
+window.onload = loadComments;
+</script>
+
+</body>
+</html>
